@@ -1,0 +1,137 @@
+<!DOCTYPE HTML>
+        <html>
+        <head>
+                <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+                <title>Sockettester</title>
+                <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+                  <script type="text/javascript">
+                    var plot1;
+                    function myFunction(s1) {
+                        ticks=['left', 'right', 'forward', 'reverse', "snapshot"];
+                        plot1 = $.jqplot('chart1', [s1], {
+                            // Only animate if we're not using excanvas (not in IE 7 or IE 8)..
+                            animate: !$.jqplot.use_excanvas,
+                            seriesDefaults:{
+                                renderer:$.jqplot.BarRenderer,
+                                pointLabels: { show: true }
+                            },
+                            axes: {
+                                xaxis: {
+                                    renderer: $.jqplot.CategoryAxisRenderer,
+                                    ticks: ticks
+                                }
+                            },
+
+                        });
+                    }   
+
+                    $(document).ready(function(){
+                        myFunction([0,1,2,3,4]);
+                        
+                    });
+              
+                    var ws = null;
+                    function ready() {
+                        ws = new WebSocket("ws://23.253.239.92:8080/client");
+
+                        ws.onopen = function () {
+                          //ws.send('Ping');
+                        };
+
+                        ws.onerror = function (e) {
+                        };
+                       
+                        ws.onerror = function (error) {
+                        };
+                        var bool=0;
+                        var img;
+                        ws.onmessage = function (e) {
+                                if(e.data.substring(0,6)=="stats:")
+                                {
+                                    var myArray =e.data.substring(6,20).split(',');
+                                    for(var i=0; i<myArray.length; i++) { myArray[i] = parseInt(myArray[i], 10); } 
+                                    if(bool==0)
+                                    { 
+                                        plot1.destroy();
+                                        ticks=['left', 'right', 'forward', 'reverse', "snapshot"];
+                                        plot1 = $.jqplot('chart1', [myArray], {
+                                            // Only animate if we're not using excanvas (not in IE 7 or IE 8)..
+                                            animate: !$.jqplot.use_excanvas,
+                                            seriesDefaults:{
+                                                renderer:$.jqplot.BarRenderer,
+                                                pointLabels: { show: true }
+                                            },
+                                            axes: {
+                                                xaxis: {
+                                                    renderer: $.jqplot.CategoryAxisRenderer,
+                                                    ticks: ticks
+                                                }
+                                            },
+
+                                        });
+                                        bool=1;
+                                    }else{
+                                        plot1.destroy();
+                                        ticks=['left', 'right', 'forward', 'reverse', "snapshot"];
+                                        plot1 = $.jqplot('chart1', [myArray], {
+                                            // Only animate if we're not using excanvas (not in IE 7 or IE 8)..
+                                            seriesDefaults:{
+                                                renderer:$.jqplot.BarRenderer,
+                                                pointLabels: { show: true }
+                                            },
+                                            axes: {
+                                                xaxis: {
+                                                    renderer: $.jqplot.CategoryAxisRenderer,
+                                                    ticks: ticks
+                                                }
+                                            },
+
+                                        });   
+                                    }
+                                }
+                                else
+                                {
+                                    $("#image").attr('src',  'data:image/jpg;base64,'+e.data);
+                                }
+                        }
+                    }
+                    document.addEventListener("DOMContentLoaded", ready, false);
+                </script>
+        </head>
+        <body>
+                <div >
+                    <img id="image" src="" width="320" height="240"></div> 
+                    
+                </div>
+                
+                </br>
+                <button type="button" onclick="ws.send('turn_left')">Turn Left</button>
+                <button type="button" onclick="ws.send('move_forward')">Move Forward</button>
+                <button type="button" onclick="ws.send('turn_right')">Turn Right</button>
+                <button type="button" onclick="ws.send('move_backward')">Move Backward</button>
+                <button type="button" onclick="ws.send('snap_image');">Snap Image</button>
+                <div id="chart1" style="margin-top:20px; margin-left:20px; width:300px; height:300px; "></div>       
+
+
+
+
+
+    
+  
+
+
+    <script class="include" type="text/javascript" src="../jquery.jqplot.min.js"></script>
+
+<!-- Additional plugins go here -->
+
+  <script class="include" type="text/javascript" src="../plugins/jqplot.barRenderer.min.js"></script>
+  <script class="include" type="text/javascript" src="../plugins/jqplot.categoryAxisRenderer.min.js"></script>
+  <script class="include" type="text/javascript" src="../plugins/jqplot.pointLabels.min.js"></script>
+
+<!-- End additional plugins -->
+
+        </div>
+               </div>
+    </div>
+        </body>
+</html>

@@ -1,0 +1,4 @@
+data/main.cpp.i
+data/WizFi250Interface.lib.i
+data/mbed.bld.i
+data/WebSocketClient.lib.i
